@@ -1,0 +1,154 @@
+<div ng-include="'views/navbar.html'"></div>
+<div class="main-content">
+    <div class="container-fluid">
+        <div class="container">
+            <script type="text/ng-template" id="output.html">
+                <div class="modal-header">
+                    <h3 class="modal-title">Logs</h3>
+                </div>
+                <div class="modal-body">
+                    <div class="col-sm-12">
+                        <div class="row" style="margin-top: 20px;"></div>
+                        <div class="row">
+                            <textarea id="outputArea" name="outputArea" ng-model="output" name="Text1" cols="77" rows="10"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="row" style="margin-bottom: 20px;"></div>
+                    <button class="btn btn-warning" type="button" ng-click="close()">Close</button>
+                </div>
+            </script>
+            <style type="text/css">
+                .grid {
+                    height: 300px;
+                }
+            </style>
+            <!-- Default report -->
+            <div class="row" style="margin-top: 20px;"></div>
+            <div ng-controller="taskRunnerCtrl">
+                <sq-message error-message="errorMessage" success-message="successMessage"></sq-message>
+                <form name="stackForm" novalidate>
+                    <div class="row">
+                        <div class="col-sm-2">
+                            <div class="form-group" show-errors>
+                                <label class="control-label" for="requester">Requester:</label>
+                                <input type="text" class="form-control" name="name" placeholder="Requester name" required ng-model="requester">
+                                <div class="help-block with-errors"></div>
+                            </div>
+                        </div>
+                        <div class="col-sm-2">
+                            <div class="form-group" show-errors>
+                                <label class="control-label" for="release" required>Test env:</label>
+                                <select class="form-control" name="release" ng-model="selectedEnvironment" ng-options="environment.env_number for environment in environments">
+                                </select>
+                                <div class="help-block with-errors"></div>
+                            </div>
+                        </div>
+                        <div class="col-sm-2">
+                            <div class="form-group" show-errors>
+                                <label class="control-label" for="type">Interface:</label>
+                                <select class="form-control" name="type" ng-model="selectedInterface" required>
+                                    <option value="celery">Celery</option>
+                                </select>
+                                <div class="help-block with-errors"></div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group" show-errors>
+                                <label class="control-label" for="team">Test template:</label>
+                                <select class="form-control" name="team" ng-model="selectedTest" ng-options="test for test in tests" required>
+                                </select>
+                                <div class="help-block with-errors"></div>
+                            </div>
+                        </div>
+                        <div class="col-sm-2" style="margin-top: 25px;">
+                            <button class="btn btn-primary" ng-click="createTask()">Go</button>
+                        </div>
+                    </div>
+                </form>
+                <div class="row" style="margin-top: 20px;"></div>
+                <div class="row">
+                    <div class="col-sm-4">
+                        <label for="search">Search:</label>
+                        <input class="form-control" placeholder="Search" ng-model="searchKey"></input>
+                    </div>
+                    <div class="col-sm-2">
+                        <label for="search">Items per page:</label>
+                        <input type="number" min="1" max="100" class="form-control" ng-model="pageSize">
+                    </div>
+                </div>
+                <div class="row" style="margin-top: 20px;"></div>
+                <div class="row" ng-show="loading">
+                    <div class="col-sm-12">
+                        <img src="/images/progressring.gif" />
+                            Loading...
+                    </div>
+                </div>
+                <div ng-show="results.length > 0">
+                    <div class="col-sm-12">
+                        <div class="row">
+                            <div class="col-sm-2">
+                                <h4>Req id</h4>
+                            </div>
+                            <div class="col-sm-2">
+                                <h4>Requester</h4>
+                            </div>
+                            <div class="col-sm-1">
+                                <h4>Created</h4>
+                            </div>
+                            <div class="col-sm-1">
+                                <h4>Test env</h4>
+                            </div>
+                            <div class="col-sm-3">
+                                <h4>Template</h4>
+                            </div>
+                            <div class="col-sm-2">
+                                <h4>Test plan id</h4>
+                            </div>
+                            <div class="col-sm-1">
+                                <h4>Status</h4>
+                            </div>
+                        </div>
+                        <div class="row" dir-paginate="test_task in results | filter:searchKey | itemsPerPage: pageSize" pagination-id="listTasks" current-page="currentPage" ng-class-odd="'oddRow'">
+                            <div class="col-sm-2">
+                                {{ test_task.request_id }}
+                            </div>
+                            <div class="col-sm-2">
+                                {{ test_task.requester }}
+                            </div>
+                            <div class="col-sm-1">
+                                {{ test_task.created | date: 'dd/MM/yyyy H:mm:ss' }}
+                            </div>
+                            <div class="col-sm-1">
+                                {{ test_task.test_environment }}
+                            </div>
+                            <div class="col-sm-3" title="{{ test_task.template }}">
+                                <a href ng-click="getTaskOutput(test_task)">{{ test_task.template | truncate: 35 }}</a>
+                            </div>
+                            <div class="col-sm-2" title="{{ test_task.task_id }}">
+                                {{ test_task.task_id | truncate: 15 }}
+                            </div>
+                            <div class="col-sm-1">
+                                <img ng-show="test_task.status == 'IN PROGRESS'" title="In progress" style="max-width: 30px; height: auto;" src="/images/progressring.gif" />
+                                <img ng-show="test_task.status == 'PENDING'" title="Pending" style="max-width: 30px; height: auto;" src="/images/pending.png" />
+                                <img ng-show="test_task.status == 'COMPLETE'" title="Completed" style="max-width: 30px; height: auto;" src="/images/finished.png" />
+                                <img ng-show="test_task.status == 'ERROR'" title="Failure" style="max-width: 30px; height: auto;" src="/images/error.png" />
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <dir-pagination-controls boundary-links="true" pagination-id="listTasks"></dir-pagination-controls>
+                        </div>
+                    </div>
+                </div>
+                <div ng-show="results.groups.length == 0">
+                    <div class="row">
+                        <div class="col-sm-12 col-sm-offset-3">
+                            <h2>No results for this team</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

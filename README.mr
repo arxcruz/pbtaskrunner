@@ -1,0 +1,7 @@
+sudo apt-get install git virtualenv npm redis-server postgresql postgresql-contrib postgresql-server-dev-all python-dev libxml2-dev
+sudo ln -s /usr/bin/nodejs /usr/bin/node
+sudo npm install gulp -g
+npm install
+gulp dev
+
+pip install markupsafe
