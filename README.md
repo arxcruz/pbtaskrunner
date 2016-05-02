@@ -1,5 +1,6 @@
 # PB Task Runner
 
+
 ## About
 This is a POC test runner, using python, celery, angularjs, flask and redis
 
@@ -8,12 +9,14 @@ either as a mod_wsgi or standalone, a redis server used as a messaging system,
 and celery who connects to redis server to manage the tasks.
 
 ## Installation
+
 ### Development environment
 You need to have some packages installed:
 * virtualenv
 * npm
 * redis-server
 * development packages for redis
+
 #### Setting up the environment
 First you need to create a virtualenv
 
@@ -22,30 +25,44 @@ cd pbtaskrunner_dir
 virtualenv .virtualenv
 source .virtualenv/bin/activate
 ```
+
 Then install the dependences:
 ```bash
 pip install -r requirements.txt
 ```
+
 Now you need to install gulp and bower globally
+
 ```bash
 sudo npm install gulp -g
 sudo npm install bower -g
 ```
-Now you can run npm and bower install inside pbtaskrunner directory
+
+Now you can run npm and bower install inside pbtaskrunner directory:
+
 ```bash
 npm install
 bower install
 ```
+
 Depending on your distro, npm package doesn't link node, and during the package
 installation, it might complain that you don't have node binary installed, so
 you can just create a symbolic link:
+
 ```bash
 sudo ln -sf /usr/bin/npm /usr/bin/node
 ```
+
 Generate the web page files:
 ```bash
 gulp dev
 ```
+
+Create database
+```bash
+python loaddb.py
+```
+
 #### Running
 
 Now you're able to run the services:
