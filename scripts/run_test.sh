@@ -38,4 +38,4 @@ if [ -f test-requirements.txt ]; then
 fi
 
 echo "Running test now"
-python -m testtools.run $TEST
+python -m unittest $TEST
