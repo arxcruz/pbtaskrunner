@@ -14,6 +14,7 @@ and celery who connects to redis server to manage the tasks.
 You need to have some packages installed:
 * virtualenv
 * npm
+* nodejs-legacy (ubuntu)
 * redis-server
 * development packages for redis
 
@@ -44,6 +45,28 @@ Now you can run npm and bower install inside pbtaskrunner directory:
 npm install
 bower install
 ```
+
+If the above commands fail with the following error:
+```
+464 error Error: EACCES, mkdir '/home/arxcruz/tmp/npm-15103-QLU5egEY'
+464 error  { [Error: EACCES, mkdir '/home/arxcruz/tmp/npm-15103-QLU5egEY']
+464 error   errno: 3,
+464 error   code: 'EACCES',
+464 error   path: '/home/arxcruz/tmp/npm-15103-QLU5egEY' }
+465 error Please try running this command again as root/Administrator.
+466 error System Linux 4.2.0-27-generic
+467 error command "/usr/bin/nodejs" "/usr/bin/npm" "install"
+468 error cwd /home/arxcruz/pbtaskrunner
+469 error node -v v0.10.25
+470 error npm -v 1.3.10
+471 error path /home/arxcruz/tmp/npm-15103-QLU5egEY
+472 error code EACCES
+473 error errno 3
+474 error stack Error: EACCES, mkdir '/home/arxcruz/tmp/npm-15103-QLU5egEY'
+```
+
+Run again as root
+
 
 Depending on your distro, npm package doesn't link node, and during the package
 installation, it might complain that you don't have node binary installed, so
