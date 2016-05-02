@@ -75,7 +75,6 @@ function TaskRunnerCtrl($scope, $uibModal, $interval, testApi, environmentApi,
     }
 
     function getTaskOutput(selected_task) {
-        console.log('passou');
         var modalInstance = $uibModal.open({
             animation: true,
             templateUrl: 'output.html',
