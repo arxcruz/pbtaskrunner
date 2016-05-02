@@ -8,11 +8,7 @@ from flask_restful import Api
 from flask_restful import Resource
 
 from celery import Celery
-import random
-import re
 import subprocess
-import time
-import unittest
 import json
 
 
@@ -160,12 +156,13 @@ def after_request(response):
 
 @app.route('/api/v1.0/tests')
 def get_tests():
-    loader = unittest.TestLoader()
-    discovered_tests = loader.discover(app.config['TESTS_DIR'])
-    tests = discovered_tests._tests
-    regex_exp = 'testMethod=(.*?)\>]>'
-    return_value = [re.search(regex_exp, str(t)).group(1) for t in tests]
-    return json.dumps({'tests': return_value})
+    # I know there's a better way, but I don't know...
+    tests = []
+    p = subprocess.Popen(['testr', 'list-tests'], stdout=subprocess.PIPE)
+    for line in iter(p.stdout.readline, b''):
+        if line.startswith('tests') and '.' in line:
+            tests.append(line.strip())
+    return json.dumps({'tests': tests})
 
 
 @celery.task(bind=True)
@@ -207,37 +204,6 @@ def run_tests(self, test_id):
 
     db.session.commit()
     return {'output': result, 'return_value': return_value}
-
-    # verb = ['Starting up', 'Booting', 'Repairing', 'Loading', 'Checking']
-    # adjective = ['master', 'radiant', 'silent', 'harmonic', 'fast']
-    # noun = ['solar array', 'particle reshaper', 'cosmic ray', 'orbiter', 'bit']
-    # message = ''
-    # total = random.randint(10, 50)
-    # test = TestTask.query.get(test_id)
-    # if not test:
-    #     return {}
-    #
-    # for i in range(total):
-    #     if not message or random.random() < 0.25:
-    #         message = '{0} {1} {2}...'.format(random.choice(verb),
-    #                                           random.choice(adjective),
-    #                                           random.choice(noun))
-    #     test.status = 'IN PROGRESS'
-    #     test.output = message
-    #     self.update_state(state='PROGRESS',
-    #                       meta={'current': i, 'total': total,
-    #                             'output': message})
-    #     db_session.commit()
-    #     time.sleep(1)
-    #
-    # test.status = 'COMPLETE'
-    # env = TestEnvironment.query.get(test.test_environment)
-    # if env:
-    #     env.in_use = False
-    # db_session.commit()
-    #
-    # return {'current': 100, 'total': 100, 'output': 'Task completed!',
-    #         'result': 42}
 
 
 from pbtaskrunner.models import TestTask, TestEnvironment
