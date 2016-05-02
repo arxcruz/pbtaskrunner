@@ -6,7 +6,6 @@ import datetime
 import json
 import mock
 
-from pbtaskrunner import run_tests
 from pbtaskrunner import app, db
 from pbtaskrunner.models import TestEnvironment
 from pbtaskrunner.models import TestTask
@@ -144,6 +143,12 @@ class ApiTestCase(unittest.TestCase):
                     'uri': 'http://localhost/api/v1.0/testtask/5'}
         self.assertEqual(expected, task)
         run_tests_mock.assert_called_once()
+
+    def test_dummy_will_fail(self):
+        data = {'requester': 'Dummy requester', 'test_environment': 2,
+                'template': 'test_dummy_task', 'status': 'PENDING'}
+        response = self.app.post('/api/v1.0/testtask', data=data)
+        self.assertEqual(200, response.status_code)
 
 
 def load_json(api_response):
