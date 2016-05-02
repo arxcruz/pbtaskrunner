@@ -10,7 +10,6 @@ set +x
 
 TEST_DIR=$1
 TEST=$2
-export LC_ALL="en"
 
 pushd $TEST_DIR
 
