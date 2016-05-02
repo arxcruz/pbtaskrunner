@@ -2,9 +2,10 @@ import os
 
 _basedir = os.path.abspath(os.path.dirname(__file__))
 
-DATABASE_URI = 'sqlite:///%s' % os.path.join(_basedir, 'pbtaskrunner.db')
-DATABASE_CONNECT_OPTIONS = {}
+SQLALCHEMY_DATABASE_URI = ('sqlite:///%s' %
+                           os.path.join(_basedir, 'pbtaskrunner.db'))
 
+SQLALCHEMY_TRACK_MODIFICATIONS = True
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 

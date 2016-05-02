@@ -1,10 +1,12 @@
 from flask import Flask
+from flask.ext.sqlalchemy import SQLAlchemy
 from flask_restful import abort
 from flask_restful import fields
 from flask_restful import marshal_with
 from flask_restful import reqparse
 from flask_restful import Api
 from flask_restful import Resource
+
 from celery import Celery
 import random
 import re
@@ -21,15 +23,15 @@ app = Flask(__name__)
 app.config.from_object('websiteconfig')
 app.secret_key = 'a6ac0d63-abbc-4bb4-9702-8408392f9dff'
 
+# Initialize database
+db = SQLAlchemy(app)
+
 # Initialize flask-restful
 api = Api(app)
 
 # Initialize Celery
 celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
 celery.conf.update(app.config)
-
-from models import TestTask
-from models import TestEnvironment
 
 # Test Task REST Api
 test_fields = {
@@ -78,7 +80,7 @@ class TestTaskResource(Resource):
         test.template = args['template']
         test.status = args['status']
 
-        db_session.commit()
+        db.session.commit()
         return test, 201
 
 
@@ -107,12 +109,12 @@ class TestTaskListResource(Resource):
         test.template = args['template']
         test.status = 'PENDING'
 
-        db_session.add(test)
+        db.session.add(test)
         env.in_use = True
-        db_session.commit()
+        db.session.commit()
         task = run_tests.apply_async(args=[test.request_id])
         test.task_id = task.id
-        db_session.commit()
+        db.session.commit()
 
         return test, 201
 
@@ -143,7 +145,7 @@ api.add_resource(TestEnvironmentListResource, '/api/v1.0/envs',
 
 @app.teardown_request
 def remove_db_session(exception):
-    db_session.remove()
+    db.session.remove()
 
 
 @app.after_request
@@ -179,7 +181,7 @@ def run_tests(self, test_id):
     p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                          bufsize=1)
     test.status = 'IN PROGRESS'
-    db_session.commit()
+    db.session.commit()
 
     for line in iter(p.stdout.readline, b''):
         result += line + '\n'
@@ -203,7 +205,7 @@ def run_tests(self, test_id):
     if env:
         env.in_use = False
 
-    db_session.commit()
+    db.session.commit()
     return {'output': result, 'return_value': return_value}
 
     # verb = ['Starting up', 'Booting', 'Repairing', 'Loading', 'Checking']
@@ -238,4 +240,4 @@ def run_tests(self, test_id):
     #         'result': 42}
 
 
-from pbtaskrunner.database import db_session
+from pbtaskrunner.models import TestTask, TestEnvironment
