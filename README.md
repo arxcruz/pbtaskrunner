@@ -93,3 +93,16 @@ celery worker -A pbtaskrunner.celery --loglevel=info
 Now you can go on your browser on http://localhost:5001/
 
 And you should see the the PB Task Runner in action.
+
+## Some screenshots
+### Tests running
+![alt text](https://github.com/arxcruz/pbtaskrunner/raw/master/screenshot/running.png)
+
+### Pending test
+![alt text](https://github.com/arxcruz/pbtaskrunner/raw/master/screenshot/pending_test.png)
+
+### Logs
+![alt text](https://github.com/arxcruz/pbtaskrunner/raw/master/screenshot/show_logs.png)
+
+### Several runs simultaneously
+![alt text](https://github.com/arxcruz/pbtaskrunner/raw/master/screenshot/two_runs.png)
