@@ -9,8 +9,8 @@ SQLALCHEMY_TRACK_MODIFICATIONS = True
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 
-TESTS_DIR = "/home/arxcruz/ansible"
-SCRIPT_FILE = "/media/psf/pbtaskrunner/scripts/run_test.sh"
+TESTS_DIR = _basedir
+SCRIPT_FILE = os.path.join(_basedir, 'scripts/run_test.sh')
 
 REDIS_HOST = '127.0.0.1'
 REDIS_PORT = 5000
